@@ -1,13 +1,14 @@
 import React from "react";
+import Header from "../../components/Header";
+import Tabela from "../../components/Tabela";
 
 const Home: React.FC = () => {
   return (
-    <div>
-      <div>
-        Template usando Typescript, React JS, Styled Components e MUI; 
-      </div>
-    </div>
-  );
+      <>
+        <Header/>
+        <Tabela />
+      </>
+   );
 };
 
 export default Home;
