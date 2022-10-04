@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "https://jsonplaceholder.typicode.com",
+  baseURL: "https://api-andre-2029.herokuapp.com/sistemaRecados/recado",
 });
 
 async function get(url: string) {
@@ -10,4 +10,4 @@ async function get(url: string) {
   return response.data;
 }
 
-export { get };
+export { get, api };
