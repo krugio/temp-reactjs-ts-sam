@@ -206,7 +206,7 @@ export default function Tabela() {
               <Container sx={{ mt: 7 }}>
                 <Stack direction='row' spacing={120} sx={{ mb: 2 }}>
                   <ToggleButton value="bold" aria-label="bold" onClick={() => arqui()}>
-                    <Badge badgeContent={totArq} color="primary">
+                    <Badge badgeContent={totArq} color="secondary">
                       <DownloadForOfflineIcon sx={{ fontSize: 40 }} />
                     </Badge>
                   </ToggleButton>
@@ -297,7 +297,7 @@ export default function Tabela() {
                 <Stack direction='row' spacing={120} sx={{ mb: 2 }}>
 
                   <ToggleButton value="bold" aria-label="bold" onClick={() => arqui()}>
-                    <Badge badgeContent={totArq} color="primary">
+                    <Badge badgeContent={totArq} color="secondary">
                       <DownloadForOfflineIcon sx={{ fontSize: 40 }} />
                     </Badge>
                   </ToggleButton>
