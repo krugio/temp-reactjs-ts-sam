@@ -7,11 +7,12 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import { Button, Container, Dialog, DialogTitle, Grid, IconButton, TextField, ToggleButton, Typography } from '@mui/material';
+import { Badge, Button, Container, Dialog, DialogTitle, Grid, IconButton, TextField, ToggleButton, Typography } from '@mui/material';
 import { Stack } from '@mui/system';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import EditIcon from '@mui/icons-material/Edit';
 import DownloadForOfflineIcon from '@mui/icons-material/DownloadForOffline';
+import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
 import { api, get } from '../service/api/jasonplaceholder/toDos';
 import axios from 'axios';
 
@@ -53,8 +54,9 @@ export default function Tabela() {
   const [descricao, setDescricao] = useState('');
 
 
- const[listArq, setlistArq] = useState([]);
-  const[btnArq, setBtnArq] = useState(false);
+  const [listArq, setlistArq] = useState([]);
+  const [btnArq, setBtnArq] = useState(false);
+  const [totArq, setTotArq] = useState('');
 
 
 
@@ -122,20 +124,30 @@ export default function Tabela() {
 
   }
 
-  function arquivado(id:number, titulo:string, descricao:string){
+  function totalArquivados() {
+    let tot = JSON.parse(localStorage.getItem('arquivado') || '[]')
+    let p = tot.length;
 
- let x = JSON.parse(localStorage.getItem('arquivado') || '[]');
+    setTotArq(p);
 
-  const novoArquivo = {
-                      id: `ARQ-${id}`,
-                      titulo:titulo,
-                      descricao:descricao
-                    }
 
-                    x.push(novoArquivo);
+  }
+
+  function arquivado(id: number, titulo: string, descricao: string) {
+
+    let x = JSON.parse(localStorage.getItem('arquivado') || '[]');
+
+    const novoArquivo = {
+      id: id,
+      titulo: titulo,
+      descricao: descricao
+    }
+
+    x.push(novoArquivo);
 
     localStorage.setItem('arquivado', JSON.stringify(x))
     deletarRecado(id);
+    totalArquivados();
     alert("Recado arquivado com sucesso!");
 
 
@@ -159,11 +171,11 @@ export default function Tabela() {
       });
   }
 
-  function arqui(){
+  function arqui() {
     setBtnArq(!btnArq);
 
-    let listAr = JSON.parse(localStorage.getItem('arquivado')|| '[]');
-    
+    let listAr = JSON.parse(localStorage.getItem('arquivado') || '[]');
+
     setlistArq(listAr);
 
 
@@ -177,6 +189,8 @@ export default function Tabela() {
   useEffect(() => {
 
     listar();
+    totalArquivados();
+
 
 
   }, []);
@@ -185,15 +199,18 @@ export default function Tabela() {
 
   return (
     <>
-    {!btnArq  ? (
-      <>
-            <Grid container>
+      {btnArq ? (
+        <>
+          <Grid container>
             <Grid item xs={12} >
               <Container sx={{ mt: 7 }}>
-              <ToggleButton value="bold" aria-label="bold" onClick={()=> arqui()}>
-                   <DownloadForOfflineIcon />
-               </ToggleButton>
-             
+                <Stack direction='row' spacing={120} sx={{ mb: 2 }}>
+                  <ToggleButton value="bold" aria-label="bold" onClick={() => arqui()}>
+                    <Badge badgeContent={totArq} color="primary">
+                      <DownloadForOfflineIcon sx={{ fontSize: 40 }} />
+                    </Badge>
+                  </ToggleButton>
+                </Stack>
                 <TableContainer component={Paper}>
                   <Table aria-label="customized table">
                     <TableHead>
@@ -201,11 +218,11 @@ export default function Tabela() {
                         <StyledTableCell>#ID</StyledTableCell>
                         <StyledTableCell align="center" >TÍTULO</StyledTableCell>
                         <StyledTableCell align="center">DESCRIÇÃO</StyledTableCell>
-                        <StyledTableCell align="center">AÇÕES</StyledTableCell>
+
                       </TableRow>
                     </TableHead>
                     <TableBody>
-    
+
                       {listArq.map((row: any) => (
                         <StyledTableRow >
                           <StyledTableCell >
@@ -214,35 +231,21 @@ export default function Tabela() {
                           <StyledTableCell align="center">{row.titulo}</StyledTableCell>
                           <StyledTableCell align="center">{row.descricao}
                           </StyledTableCell>
-                          <StyledTableCell align="center" sx={{ display: 'flex', justifyContent: 'center' }}>
-                            <Stack direction='row' spacing={2}>
-                              <IconButton onClick={() => deletarRecado(row.id)}>
-                                <DeleteForeverIcon sx={{ fontSize: 35 }} />
-                              </IconButton>
-                              <IconButton onClick={() => editarRecado(row.id, row.titulo, row.descricao)}>
-                                <EditIcon sx={{ fontSize: 35 }} />
-                              </IconButton>
-    
-                              <IconButton onClick={() => arquivado(row.id, row.titulo, row.descricao)}>
-                                <DownloadForOfflineIcon sx={{ fontSize: 35 }} />
-                              </IconButton>
-    
-                            </Stack>
-                          </StyledTableCell>
+
                         </StyledTableRow>
                       ))}
-    
-    
-    
-    
+
+
+
+
                     </TableBody>
                   </Table>
                 </TableContainer>
               </Container>
             </Grid>
           </Grid>
-    
-    
+
+
           {/* MODAL NOVO RECADO */}
           <Dialog open={modalNovo}>
             <DialogTitle>Novo recado</DialogTitle>
@@ -260,8 +263,8 @@ export default function Tabela() {
             </Container>
           </Dialog>
           {/* Final modal nov recacado */}
-    
-    
+
+
           {/* MODAL Editar */}
           <Dialog open={modalEditar}>
             <DialogTitle>Editar Recado</DialogTitle>
@@ -279,22 +282,27 @@ export default function Tabela() {
             </Container>
           </Dialog>
           {/* Final ediatr */}
-    
-    
-    
+
+
+
         </>
-    
-        ) : (
-          <>
+
+      ) : (
+        <>
 
 
-<Grid container>
+          <Grid container>
             <Grid item xs={12} >
               <Container sx={{ mt: 7 }}>
-              <ToggleButton value="bold" aria-label="bold" onClick={()=> arqui()}>
-                   <DownloadForOfflineIcon />
-               </ToggleButton>
-                <Button variant='contained' sx={{ mb: 2 }} onClick={() => setModalNovo(true)}> NOVO RECADO</Button>
+                <Stack direction='row' spacing={120} sx={{ mb: 2 }}>
+
+                  <ToggleButton value="bold" aria-label="bold" onClick={() => arqui()}>
+                    <Badge badgeContent={totArq} color="primary">
+                      <DownloadForOfflineIcon sx={{ fontSize: 40 }} />
+                    </Badge>
+                  </ToggleButton>
+                  <Button variant='contained' sx={{ mb: 2, color: 'white' }} onClick={() => setModalNovo(true)} > <PlaylistAddIcon /><b>NOVO RECADO</b></Button>
+                </Stack>
                 <TableContainer component={Paper}>
                   <Table aria-label="customized table">
                     <TableHead>
@@ -306,7 +314,7 @@ export default function Tabela() {
                       </TableRow>
                     </TableHead>
                     <TableBody>
-    
+
                       {lista.map((row: any) => (
                         <StyledTableRow >
                           <StyledTableCell >
@@ -323,27 +331,27 @@ export default function Tabela() {
                               <IconButton onClick={() => editarRecado(row.id, row.titulo, row.descricao)}>
                                 <EditIcon sx={{ fontSize: 35 }} />
                               </IconButton>
-    
+
                               <IconButton onClick={() => arquivado(row.id, row.titulo, row.descricao)}>
                                 <DownloadForOfflineIcon sx={{ fontSize: 35 }} />
                               </IconButton>
-    
+
                             </Stack>
                           </StyledTableCell>
                         </StyledTableRow>
                       ))}
-    
-    
-    
-    
+
+
+
+
                     </TableBody>
                   </Table>
                 </TableContainer>
               </Container>
             </Grid>
           </Grid>
-    
-    
+
+
           {/* MODAL NOVO RECADO */}
           <Dialog open={modalNovo}>
             <DialogTitle>Novo recado</DialogTitle>
@@ -361,8 +369,8 @@ export default function Tabela() {
             </Container>
           </Dialog>
           {/* Final modal nov recacado */}
-    
-    
+
+
           {/* MODAL Editar */}
           <Dialog open={modalEditar}>
             <DialogTitle>Editar Recado</DialogTitle>
@@ -380,13 +388,13 @@ export default function Tabela() {
             </Container>
           </Dialog>
           {/* Final ediatr */}
-    
-
-          </>
 
 
-        )}
-    
-</>
+        </>
+
+
+      )}
+
+    </>
   );
 }
