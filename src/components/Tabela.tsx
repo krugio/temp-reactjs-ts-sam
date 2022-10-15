@@ -75,6 +75,12 @@ export default function Tabela() {
 
   const salvarRecado = () => {
 
+    if(statusRecado === ""){
+      alert("Por favor selecione o status do recado");
+      return;
+    }
+
+
     api.post('', {
 
       titulo: titulo,
@@ -95,6 +101,7 @@ export default function Tabela() {
 
   function salvarRecadoEditado() {
 
+    
     axios.put(`https://api-andre-2029.herokuapp.com/sistemaRecados/recado/${id}`, {
       id: id,
       titulo: titulo,
@@ -371,7 +378,9 @@ export default function Tabela() {
               <TextField onChange={(e) => setDescricao(e.target.value)} fullWidth />
               <Container sx={{mt:2}}>
               <FormControl>
-                  <FormLabel id="demo-row-radio-buttons-group-label">Gender</FormLabel>
+                <Typography align='center'>
+                  <FormLabel id="demo-row-radio-buttons-group-label"><b>STATUS DO RECADO</b></FormLabel>
+                  </Typography>
                   <RadioGroup
                     row
                     aria-labelledby="demo-row-radio-buttons-group-label"
@@ -385,7 +394,7 @@ export default function Tabela() {
                 </FormControl>
                 </Container>
              
-              <Container sx={{ mt: 2 }}>
+              <Container sx={{ mt: 2, display:'flex', justifyContent:'center' }}>
                 <Stack direction="row" spacing={2} sx={{ mb: 3 }}>
                   <Button variant="contained" onClick={() => salvarRecado()}>Salvar</Button>
                   <Button variant="outlined" onClick={() => setModalNovo(false)}>Cancelar</Button>
