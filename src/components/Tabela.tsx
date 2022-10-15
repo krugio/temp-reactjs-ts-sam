@@ -7,7 +7,7 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import { Badge, Button, Container, Dialog, DialogTitle, Grid, IconButton, TextField, ToggleButton, Typography } from '@mui/material';
+import { Badge, Button, Container, Dialog, DialogTitle, FormControl, FormControlLabel, FormLabel, Grid, IconButton, Radio, RadioGroup, TextField, ToggleButton, Typography } from '@mui/material';
 import { Stack } from '@mui/system';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import EditIcon from '@mui/icons-material/Edit';
@@ -59,6 +59,9 @@ export default function Tabela() {
   const [totArq, setTotArq] = useState('');
 
 
+  const[statusRecado,setaStatusRecado] = useState('');
+
+
 
   const listar = () => {
 
@@ -75,7 +78,8 @@ export default function Tabela() {
     api.post('', {
 
       titulo: titulo,
-      descricao: descricao
+      descricao: descricao,
+      status: statusRecado
     })
       .then(function (response) {
         alert('Recado criado com sucesso!')
@@ -94,7 +98,8 @@ export default function Tabela() {
     axios.put(`https://api-andre-2029.herokuapp.com/sistemaRecados/recado/${id}`, {
       id: id,
       titulo: titulo,
-      descricao: descricao
+      descricao: descricao,
+    
     })
       .then(function (response) {
         console.log(response);
@@ -181,6 +186,7 @@ export default function Tabela() {
 
 
   }
+
 
 
 
@@ -310,6 +316,7 @@ export default function Tabela() {
                         <StyledTableCell>#ID</StyledTableCell>
                         <StyledTableCell align="center" >TÍTULO</StyledTableCell>
                         <StyledTableCell align="center">DESCRIÇÃO</StyledTableCell>
+                        <StyledTableCell align="center">STATUS</StyledTableCell>
                         <StyledTableCell align="center">AÇÕES</StyledTableCell>
                       </TableRow>
                     </TableHead>
@@ -322,6 +329,8 @@ export default function Tabela() {
                           </StyledTableCell>
                           <StyledTableCell align="center">{row.titulo}</StyledTableCell>
                           <StyledTableCell align="center">{row.descricao}
+                          </StyledTableCell>
+                          <StyledTableCell align="center">{row.status}
                           </StyledTableCell>
                           <StyledTableCell align="center" sx={{ display: 'flex', justifyContent: 'center' }}>
                             <Stack direction='row' spacing={2}>
@@ -360,6 +369,22 @@ export default function Tabela() {
               <TextField onChange={(e) => setTitulo(e.target.value)} fullWidth />
               <Typography variant='subtitle1'>Descricao</Typography>
               <TextField onChange={(e) => setDescricao(e.target.value)} fullWidth />
+              <Container sx={{mt:2}}>
+              <FormControl>
+                  <FormLabel id="demo-row-radio-buttons-group-label">Gender</FormLabel>
+                  <RadioGroup
+                    row
+                    aria-labelledby="demo-row-radio-buttons-group-label"
+                    name="row-radio-buttons-group"
+                  >
+                    <FormControlLabel value="female" control={<Radio onChange={()=> setaStatusRecado("Novo")}/>} label="Nova" />
+                    <FormControlLabel value="male" control={<Radio onChange={()=> setaStatusRecado("Pendente") }/>} label="pendente" />
+                    <FormControlLabel value="other" control={<Radio onChange={()=> setaStatusRecado("Concluido")} />} label="Concluido" />
+                    
+                  </RadioGroup>
+                </FormControl>
+                </Container>
+             
               <Container sx={{ mt: 2 }}>
                 <Stack direction="row" spacing={2} sx={{ mb: 3 }}>
                   <Button variant="contained" onClick={() => salvarRecado()}>Salvar</Button>
