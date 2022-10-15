@@ -7,7 +7,7 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import { Badge, Button, Container, Dialog, DialogTitle, FormControl, FormControlLabel, FormLabel, Grid, IconButton, Radio, RadioGroup, TextField, ToggleButton, Typography } from '@mui/material';
+import { Badge, Box, Button, Container, Dialog, DialogTitle, FormControl, FormControlLabel, FormLabel, Grid, IconButton, InputLabel, MenuItem, Radio, RadioGroup, Select, TextField, ToggleButton, Typography } from '@mui/material';
 import { Stack } from '@mui/system';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import EditIcon from '@mui/icons-material/Edit';
@@ -59,7 +59,13 @@ export default function Tabela() {
   const [totArq, setTotArq] = useState('');
 
 
-  const[statusRecado,setaStatusRecado] = useState('');
+  const [statusRecado, setaStatusRecado] = useState('');
+
+
+
+  const [filter, setFilter] = useState('');
+
+  const [filterType, setFilterType] = useState('');
 
 
 
@@ -75,7 +81,7 @@ export default function Tabela() {
 
   const salvarRecado = () => {
 
-    if(statusRecado === ""){
+    if (statusRecado === "") {
       alert("Por favor selecione o status do recado");
       return;
     }
@@ -101,12 +107,13 @@ export default function Tabela() {
 
   function salvarRecadoEditado() {
 
-    
+
     axios.put(`https://api-andre-2029.herokuapp.com/sistemaRecados/recado/${id}`, {
       id: id,
       titulo: titulo,
       descricao: descricao,
-    
+      status: statusRecado
+
     })
       .then(function (response) {
         console.log(response);
@@ -191,9 +198,38 @@ export default function Tabela() {
     setlistArq(listAr);
 
 
-
   }
 
+
+  function filtrarStatus(status: string) {
+    axios
+      .get(
+        `https://api-andre-2029.herokuapp.com/sistemaRecados/recado/filter?busca=${status}&operacao=status`
+      )
+      .then(function (response) {
+        console.log(response);
+        setLista(response.data)
+
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  }
+
+  function filtrarX() {
+    axios
+      .get(
+        `https://api-andre-2029.herokuapp.com/sistemaRecados/recado/filter?busca=${filter}&operacao=${filterType}`
+      )
+      .then(function (response) {
+        console.log(response);
+        setLista(response.data)
+
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  }
 
 
 
@@ -307,15 +343,54 @@ export default function Tabela() {
           <Grid container>
             <Grid item xs={12} >
               <Container sx={{ mt: 7 }}>
-                <Stack direction='row' spacing={120} sx={{ mb: 2 }}>
+                <Stack direction='row' spacing={12} sx={{ mb: 2 }}>
 
                   <ToggleButton value="bold" aria-label="bold" onClick={() => arqui()}>
                     <Badge badgeContent={totArq} color="secondary">
                       <DownloadForOfflineIcon sx={{ fontSize: 40 }} />
                     </Badge>
                   </ToggleButton>
+                  <Container>
+                    <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                      <TextField id="outlined-password-input" label="Filtro" type="text" autoComplete="Filtro" sx={{ maxWidth: 550 }} onChange={(e) => setFilter(e.target.value)} fullWidth />
+                      <Button onClick={() => filtrarX()} variant='contained' sx={{ mb: 2, color: 'white', ml: 3, mt: 1 }} > <PlaylistAddIcon /><b>FILTRAR</b></Button>
+                    </Box>
+
+                  </Container>
                   <Button variant='contained' sx={{ mb: 2, color: 'white' }} onClick={() => setModalNovo(true)} > <PlaylistAddIcon /><b>NOVO RECADO</b></Button>
                 </Stack>
+
+                <Grid container>
+                  <Grid xs={10} sx={{ display: 'flex', justifyContent: 'center', mt: -2, mb: 2 }}>
+                    <FormControl>
+
+                      <RadioGroup
+                        row
+                        aria-labelledby="demo-row-radio-buttons-group-label"
+                        name="row-radio-buttons-group"
+                      >
+                        <FormControlLabel value="female" control={<Radio />} label="titulo" onClick={() => setFilterType('titulo')} />
+                        <FormControlLabel value="male" control={<Radio />} label="descrição" onClick={() => setFilterType('descricao')} />
+                        <FormControl sx={{ width: 100 }} >
+                          <InputLabel id="demo-simple-select-label">Status</InputLabel>
+                          <Select
+                            labelId="demo-simple-select-label"
+                            id="demo-simple-select"
+
+                            label="Status"
+
+                          >
+                            <MenuItem value={10} onClick={() => filtrarStatus('concluido')}>concluido</MenuItem>
+                            <MenuItem value={20} onClick={() => filtrarStatus('pendente')}>pendente</MenuItem>
+                            <MenuItem value={30} onClick={() => filtrarStatus('cancelado')}>cancelado</MenuItem>
+                          </Select>
+                        </FormControl>
+
+                      </RadioGroup>
+                    </FormControl>
+                  </Grid>
+                </Grid>
+
                 <TableContainer component={Paper}>
                   <Table aria-label="customized table">
                     <TableHead>
@@ -376,25 +451,25 @@ export default function Tabela() {
               <TextField onChange={(e) => setTitulo(e.target.value)} fullWidth />
               <Typography variant='subtitle1'>Descricao</Typography>
               <TextField onChange={(e) => setDescricao(e.target.value)} fullWidth />
-              <Container sx={{mt:2}}>
-              <FormControl>
-                <Typography align='center'>
-                  <FormLabel id="demo-row-radio-buttons-group-label"><b>STATUS DO RECADO</b></FormLabel>
+              <Container sx={{ mt: 2 }}>
+                <FormControl>
+                  <Typography align='center'>
+                    <FormLabel id="demo-row-radio-buttons-group-label"><b>STATUS DO RECADO</b></FormLabel>
                   </Typography>
                   <RadioGroup
                     row
                     aria-labelledby="demo-row-radio-buttons-group-label"
                     name="row-radio-buttons-group"
                   >
-                    <FormControlLabel value="female" control={<Radio onChange={()=> setaStatusRecado("Novo")}/>} label="Nova" />
-                    <FormControlLabel value="male" control={<Radio onChange={()=> setaStatusRecado("Pendente") }/>} label="pendente" />
-                    <FormControlLabel value="other" control={<Radio onChange={()=> setaStatusRecado("Concluido")} />} label="Concluido" />
-                    
+                    <FormControlLabel value="female" control={<Radio onChange={() => setaStatusRecado("concluido")} />} label="concluido" />
+                    <FormControlLabel value="male" control={<Radio onChange={() => setaStatusRecado("pendente")} />} label="pendente" />
+                    <FormControlLabel value="other" control={<Radio onChange={() => setaStatusRecado("cancelado")} />} label="cancelado" />
+
                   </RadioGroup>
                 </FormControl>
-                </Container>
-             
-              <Container sx={{ mt: 2, display:'flex', justifyContent:'center' }}>
+              </Container>
+
+              <Container sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}>
                 <Stack direction="row" spacing={2} sx={{ mb: 3 }}>
                   <Button variant="contained" onClick={() => salvarRecado()}>Salvar</Button>
                   <Button variant="outlined" onClick={() => setModalNovo(false)}>Cancelar</Button>
@@ -413,6 +488,24 @@ export default function Tabela() {
               <TextField value={titulo} onChange={(e) => setTitulo(e.target.value)} fullWidth />
               <Typography variant='subtitle1'>Descricao</Typography>
               <TextField value={descricao} onChange={(e) => setDescricao(e.target.value)} fullWidth />
+              <Container sx={{ mt: 2 }}>
+                <FormControl>
+                  <Typography align='center'>
+                    <FormLabel id="demo-row-radio-buttons-group-label"><b>STATUS DO RECADO</b></FormLabel>
+                  </Typography>
+                  <RadioGroup
+                    row
+                    aria-labelledby="demo-row-radio-buttons-group-label"
+                    name="row-radio-buttons-group"
+                  >
+                    <FormControlLabel value="female" control={<Radio onChange={() => setaStatusRecado("concluido")} />} label="concluido" />
+                    <FormControlLabel value="male" control={<Radio onChange={() => setaStatusRecado("pendente")} />} label="pendente" />
+                    <FormControlLabel value="other" control={<Radio onChange={() => setaStatusRecado("cancelado")} />} label="cancelado" />
+
+                  </RadioGroup>
+                </FormControl>
+              </Container>
+
               <Container sx={{ mt: 2 }}>
                 <Stack direction="row" spacing={2} sx={{ mb: 3 }}>
                   <Button variant="contained" onClick={() => salvarRecadoEditado()} > Salvar</Button>
